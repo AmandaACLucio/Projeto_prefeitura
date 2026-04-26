@@ -1,0 +1,40 @@
+﻿version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15
+    container_name: postgres_prefeitura
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: prefeitura
+    ports:
+      - "5432:5432"
+
+
+  backend:
+    image: node:20
+    container_name: backend_prefeitura
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+
+
+  frontend:
+    image: node:20
+    container_name: frontend_prefeitura
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
