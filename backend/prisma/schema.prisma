@@ -31,7 +31,7 @@ model Saude {
   ultima_consulta  DateTime
   vacinas_em_dia   Boolean
 
-  child            Child    @relation(fields: [childId], references: [id])
+  child            Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
 }
 
 model Educacao {
@@ -40,7 +40,7 @@ model Educacao {
   escola              String?
   frequencia_percent  Int?
 
-  child               Child  @relation(fields: [childId], references: [id])
+  child               Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
 }
 
 model AssistenciaSocial {
@@ -49,7 +49,7 @@ model AssistenciaSocial {
   cad_unico        Boolean
   beneficio_ativo  Boolean
 
-  child            Child   @relation(fields: [childId], references: [id])
+  child            Child   @relation(fields: [childId], references: [id], onDelete: Cascade)
 }
 
 model Alerta {
@@ -58,5 +58,12 @@ model Alerta {
   area     String
   childId  String
 
-  child    Child  @relation(fields: [childId], references: [id])
+  child    Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+}
+
+model Historico {
+  id       Int    @id @default(autoincrement())
+  tipo     String
+  valor    Int
+  criado_em DateTime @default(now())
 }

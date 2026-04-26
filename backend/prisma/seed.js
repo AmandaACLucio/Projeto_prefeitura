@@ -3,7 +3,19 @@ const prisma = new PrismaClient();
 const data = require("../src/data/seed.json");
 
 async function main() {
+  console.log("Iniciando seed...");
+
+  // Variáveis para calcular o snapshot inicial
+  let totalAlertasSaude = 0;
+  let totalAlertasEdu = 0;
+  let totalAlertasAssis = 0;
+
   for (const c of data) {
+    // Incrementa contadores para o histórico baseado no JSON
+    totalAlertasSaude += (c.saude?.alertas?.length || 0);
+    totalAlertasEdu += (c.educacao?.alertas?.length || 0);
+    totalAlertasAssis += (c.assistencia_social?.alertas?.length || 0);
+
     await prisma.child.create({
       data: {
         id: c.id,
@@ -61,9 +73,25 @@ async function main() {
       }
     });
   }
+
+  // ADICIONA O HISTÓRICO INICIAL
+  console.log("Gerando snapshot inicial no histórico...");
+  await prisma.historico.createMany({
+    data: [
+      { tipo: "total_criancas", valor: data.length },
+      { tipo: "alertas_saude", valor: totalAlertasSaude },
+      { tipo: "alertas_educacao", valor: totalAlertasEdu },
+      { tipo: "alertas_assistencia", valor: totalAlertasAssis },
+    ]
+  });
 }
 
 main()
-  .then(() => console.log("Seed concluído 🌱"))
-  .catch(e => console.error(e))
-  .finally(() => prisma.$disconnect());
+  .then(() => console.log("Seed concluído com histórico inicial 🌱"))
+  .catch(e => {
+    console.error("Erro no seed:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

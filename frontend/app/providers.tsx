@@ -14,7 +14,8 @@ export default function Provider({
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 5, // 5 min cache (ótimo pro seu caso)
+            staleTime: 1000 * 60 * 5,
+            gcTime: 1000 * 60 * 60 * 24,
             refetchOnWindowFocus: false,
           },
         },

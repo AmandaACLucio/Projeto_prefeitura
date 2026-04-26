@@ -19,12 +19,20 @@ async function getSummary() {
   let educacao = 0;
   let assistencia = 0;
   let revisados = 0;
+  let tags = new Map();
 
   for (const c of children) {
-    if (c.saude?.alertas?.length > 0) saude++;
-    if (c.educacao?.alertas?.length > 0) educacao++;
-    if (c.assistencia?.alertas?.length > 0) assistencia++;
-    if (c.revisado) revisados++;
+    c.alertas?.forEach(alert => {
+      alert.area === "saude" ? saude++ :
+      alert.area === "educacao" ? educacao++ :
+      alert.area === "assistencia" ? assistencia++ : null;
+
+      tags.has(alert.tipo) 
+        ? tags.set(alert.tipo, tags.get(alert.tipo) + 1) 
+        : tags.set(alert.tipo, 1);
+    });
+
+    c.revisado ? revisados++ : null;
   }
 
   return {
