@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getChildById, reviewChild } from "@/services/children.service";
-import { Edit3, ArrowLeft, CheckCircle } from "lucide-react";
+import { Edit3 } from "lucide-react";
 import EditChildModal from "@/components/modals/EditChildModals";
 
 export default function ChildView({ id }: { id: string }) {
@@ -26,91 +26,94 @@ export default function ChildView({ id }: { id: string }) {
     },
   });
 
-  if (isLoading && !child) return <div className="p-6 text-gray-500 font-black animate-pulse">CARREGANDO PRONTUÁRIO...</div>;
+  if (isLoading && !child) return <div className="p-6 text-gray-500">Carregando...</div>;
   if (!child) return null;
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* 1. CABEÇALHO COM BOTÃO EDITAR */}
-      <div className="bg-white border-4 border-gray-900 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex justify-between items-start">
+      {/* CABEÇALHO */}
+      <div className="bg-white border rounded-lg p-6 shadow-sm flex justify-between items-center">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 uppercase italic tracking-tighter">{child.nome}</h1>
-          <div className="flex gap-4 mt-2 text-[11px] font-black uppercase text-gray-500 italic">
+          <h1 className="text-3xl font-bold text-gray-900">{child.nome}</h1>
+          <div className="flex gap-4 mt-2 text-gray-500 font-medium text-sm">
             <p>📍 {child.bairro}</p>
             <p>👤 Responsável: {child.responsavel}</p>
-            <p>👶 Nascimento: {new Date(child.data_nascimento).toLocaleDateString()}</p>
+            <p>👶 Data de Nascimento: {new Date(child.data_nascimento).toLocaleDateString()}</p>
           </div>
         </div>
         <button 
           onClick={() => setIsEditModalOpen(true)}
-          className="bg-orange-500 text-white p-3 border-2 border-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+          className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition shadow-sm"
         >
-          <Edit3 size={24} />
+          <Edit3 size={18} /> Editar
         </button>
       </div>
 
-      {/* 2. GRID DE CARDS */}
+      {/* GRID DE CARDS ORIGINAIS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* Saúde */}
-        <div className="border-4 border-gray-900 p-5 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h2 className="font-black text-sm mb-4 uppercase italic border-b-2 border-gray-900 pb-2 flex justify-between items-center">
-            Saúde <div className={`w-3 h-3 rounded-full ${child.saude?.vacinas_em_dia ? 'bg-green-500' : 'bg-red-500'}`} />
-          </h2>
+        <div className="border rounded-lg p-5 bg-white shadow-sm flex flex-col">
+          <h2 className="font-bold text-lg mb-4 text-blue-600 border-b pb-2">Saúde</h2>
           {child.saude ? (
-            <div className="text-[12px] space-y-2 font-bold uppercase">
-              <p className="flex justify-between border-b border-gray-100 pb-1 text-gray-500">
-                Última consulta: <span className="text-gray-900">{new Date(child.saude?.ultima_consulta).toLocaleDateString()}</span>
+            <div className="text-sm space-y-3 flex-grow">
+              <p className="flex justify-between">
+                <span className="text-gray-500">Última consulta:</span>
+                <span className="font-medium">{new Date(child.saude?.ultima_consulta).toLocaleDateString()}</span>
               </p>
               <p className="flex justify-between">
-                Vacinas: <span className={child.saude?.vacinas_em_dia ? "text-green-600" : "text-red-600"}>{child.saude?.vacinas_em_dia ? "EM DIA" : "PENDENTE"}</span>
+                <span className="text-gray-500">Vacinas em dia:</span>
+                <span className={child.saude?.vacinas_em_dia ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                  {child.saude?.vacinas_em_dia ? "Sim" : "Não"}
+                </span>
               </p>
             </div>
-          ) : <p className="text-[10px] italic">Sem dados</p>}
+          ) : <p className="text-gray-400 italic">Sem dados de saúde</p>}
         </div>
 
-        {/* Educação */}
-        <div className="border-4 border-gray-900 p-5 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h2 className="font-black text-sm mb-4 uppercase italic border-b-2 border-gray-900 pb-2">Educação</h2>
+        <div className="border rounded-lg p-5 bg-white shadow-sm flex flex-col">
+          <h2 className="font-bold text-lg mb-4 text-orange-600 border-b pb-2">Educação</h2>
           {child.educacao ? (
-            <div className="text-[12px] space-y-2 font-bold uppercase">
+            <div className="text-sm space-y-3 flex-grow">
               <p className="text-gray-500">Escola:</p>
-              <p className="text-gray-900 truncate bg-gray-50 p-1 border border-gray-200">{child.educacao?.escola || "NÃO INFORMADA"}</p>
+              <p className="font-medium truncate">{child.educacao?.escola || "Não informado"}</p>
               <p className="flex justify-between pt-2">
-                Frequência: <span className={child.educacao?.frequencia_percent < 75 ? "text-red-600" : "text-blue-600"}>{child.educacao?.frequencia_percent}%</span>
+                <span className="text-gray-500">Frequência:</span>
+                <span className={`font-bold ${child.educacao?.frequencia_percent < 75 ? "text-red-600" : "text-gray-900"}`}>
+                  {child.educacao?.frequencia_percent ?? "N/A"}%
+                </span>
               </p>
             </div>
-          ) : <p className="text-[10px] italic">Sem dados</p>}
+          ) : <p className="text-gray-400 italic">Sem dados de educação</p>}
         </div>
 
-        {/* Assistência */}
-        <div className="border-4 border-gray-900 p-5 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h2 className="font-black text-sm mb-4 uppercase italic border-b-2 border-gray-900 pb-2">Assistência Social</h2>
+        <div className="border rounded-lg p-5 bg-white shadow-sm flex flex-col">
+          <h2 className="font-bold text-lg mb-4 text-purple-600 border-b pb-2">Assistência Social</h2>
           {child.assistencia_social ? (
-            <div className="text-[12px] space-y-2 font-bold uppercase">
-              <p className="flex justify-between">CadÚnico: <span className="text-gray-900">{child.assistencia_social?.cad_unico ? "SIM" : "NÃO"}</span></p>
-              <p className="flex justify-between">Benefício: <span className={child.assistencia_social?.beneficio_ativo ? "text-green-600" : "text-red-600"}>{child.assistencia_social?.beneficio_ativo ? "ATIVO" : "INATIVO"}</span></p>
+            <div className="text-sm space-y-3 flex-grow">
+              <p className="flex justify-between">
+                <span className="text-gray-500">CadÚnico:</span>
+                <span className="font-medium">{child.assistencia_social?.cad_unico ? "Sim" : "Não"}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-gray-500">Benefício ativo:</span>
+                <span className={child.assistencia_social?.beneficio_ativo ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                  {child.assistencia_social?.beneficio_ativo ? "Sim" : "Não"}
+                </span>
+              </p>
             </div>
-          ) : <p className="text-[10px] italic">Sem dados</p>}
+          ) : <p className="text-gray-400 italic">Sem dados de assistência</p>}
         </div>
       </div>
 
-      {/* 3. AÇÕES */}
-      <div className="flex gap-4 pt-6 border-t-4 border-gray-900">
+      <div className="flex gap-3 pt-4 border-t">
         <button
           onClick={() => mutation.mutate()}
           disabled={mutation.isPending || child.revisado}
-          className="flex-1 bg-green-500 text-white py-4 border-4 border-gray-900 font-black uppercase italic shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 disabled:opacity-50 transition-all shadow-md"
         >
-          <CheckCircle size={20} />
-          {child.revisado ? "REVISÃO CONCLUÍDA" : "MARCAR COMO REVISADO"}
+          {child.revisado ? "Revisado" : mutation.isPending ? "Salvando..." : "Marcar como revisado"}
         </button>
-
-        <button
-          onClick={() => router.back()}
-          className="px-10 bg-white border-4 border-gray-900 font-black uppercase italic shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-100 flex items-center gap-2"
-        >
-          <ArrowLeft size={20} /> VOLTAR
+        <button onClick={() => router.back()} className="border-2 border-gray-200 px-8 py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-50 transition-all">
+          Voltar
         </button>
       </div>
 

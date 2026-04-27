@@ -19,7 +19,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateChild } from "@/services/children.service";
 import { Child } from "@/types/child";
 
-// 1. Schema do Zod (A "Verdade" do seu Formulário)
 const childSchema = z.object({
   nome: z.string().min(1, "O nome é obrigatório"),
   responsavel: z.string().min(1, "O responsável é obrigatório"),
@@ -52,7 +51,6 @@ interface EditChildModalProps {
 export default function EditChildModal({ child, onClose }: EditChildModalProps) {
   const queryClient = useQueryClient();
 
-  // 2. Setup do Formulário
   const { 
     register, 
     handleSubmit, 
@@ -64,10 +62,8 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
     resolver: zodResolver(childSchema),
   });
 
-  // Observa o array de alertas em tempo real
   const currentAlertas = watch("alertas") || [];
 
-  // 3. Efeito para carregar os dados quando o modal abrir
   useEffect(() => {
     if (child) {
       reset({
@@ -86,13 +82,11 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
           cad_unico: !!child.assistencia_social?.cad_unico,
           beneficio_ativo: !!child.assistencia_social?.beneficio_ativo,
         },
-        // Mapeia os alertas vindos do banco para o estado do form
         alertas: child.alertas?.map(a => ({ tipo: a.tipo, area: a.area })) || [],
       });
     }
   }, [child, reset]);
 
-  // 4. Mutation do TanStack Query
   const mutation = useMutation({
     mutationFn: (data: ChildFormValues) => updateChild(child!.id, data),
     onSuccess: () => {
@@ -101,7 +95,6 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
     },
   });
 
-  // 5. Funções de Manipulação de Alertas (Tags)
   const handleAddTag = (tipo: string, area: string) => {
     const jaExiste = currentAlertas.some(a => a.tipo === tipo && a.area === area);
     if (!jaExiste) {
@@ -117,84 +110,104 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
   if (!child) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
       <form 
         onSubmit={handleSubmit((data) => mutation.mutate(data))}
-        className="bg-white border-4 border-gray-900 w-full max-w-6xl max-h-[92vh] overflow-y-auto p-8 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative"
+        className="bg-slate-50 w-full max-w-6xl max-h-[92vh] overflow-y-auto p-8 rounded-2xl shadow-md border border-white relative"
       >
         {/* Botão Fechar */}
         <button 
           type="button" 
           onClick={onClose} 
-          className="absolute top-6 right-6 bg-red-500 border-2 border-gray-900 p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+          className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
         >
-          <X size={24} className="text-white" />
+          <X size={24} />
         </button>
 
         {/* Header */}
-        <header className="mb-10 border-b-8 border-gray-900 pb-4">
-          <h2 className="text-5xl font-black uppercase italic tracking-tighter flex items-center gap-3">
-            <ClipboardCheck size={48} className="text-blue-600" />
-            Editar Prontuário
-          </h2>
-          <span className="bg-yellow-400 border-2 border-gray-900 px-3 py-1 font-black text-sm inline-block mt-4">
-            ID DO REGISTRO: {child.id}
+        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-slate-200 pb-6">
+          <div>
+            <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
+              <ClipboardCheck size={32} className="text-blue-500" />
+              Editar Prontuário
+            </h2>
+            <p className="text-slate-500 mt-1">Atualize as informações de acompanhamento da criança.</p>
+          </div>
+          <span className="text-xs font-bold tracking-widest text-slate-400 bg-slate-200/50 px-3 py-1 rounded-full mt-4 md:mt-0">
+            ID: {child.id}
           </span>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* COLUNA 1: IDENTIFICAÇÃO */}
-          <Section title="Dados de Identificação" icon={User} color="bg-white">
-            <InputField label="Nome da Criança" name="nome" register={register} error={errors.nome} />
-            <InputField label="Nome do Responsável" name="responsavel" register={register} error={errors.responsavel} />
-            <InputField label="Bairro / Comunidade" name="bairro" register={register} error={errors.bairro} />
+          <Section title="Identificação" icon={User} color="bg-white">
+            <div className="space-y-4 p-1">
+              <InputField label="Nome da Criança" name="nome" register={register} error={errors.nome} />
+              <InputField label="Nome do Responsável" name="responsavel" register={register} error={errors.responsavel} />
+              <InputField label="Bairro / Comunidade" name="bairro" register={register} error={errors.bairro} />
+            </div>
           </Section>
 
           {/* COLUNA 2: SAÚDE E EDUCAÇÃO */}
-          <div className="space-y-4">
-            <Section title="Eixo Saúde" icon={HeartPulse} color="bg-green-50">
-              <InputField label="Última Visita Técnica" name="saude.ultima_consulta" type="date" register={register} />
-              <label className="flex items-center gap-2 font-black text-[10px] mb-4 bg-white border-2 border-gray-900 p-2 cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                <input type="checkbox" {...register("saude.vacinas_em_dia")} className="w-4 h-4 accent-black" />
-                SITUAÇÃO VACINAL REGULAR
-              </label>
-              <TagInput area="saude" tags={currentAlertas} onAdd={handleAddTag} onRemove={handleRemoveTag} />
+          <div className="space-y-6">
+            <Section title="Saúde" icon={HeartPulse} color="bg-white">
+              <div className="space-y-4 p-1">
+                <InputField label="Última Visita Técnica" name="saude.ultima_consulta" type="date" register={register} />
+                <label className="flex items-center gap-3 font-medium text-sm text-slate-700 bg-slate-50 border border-slate-200 p-3 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+                  <input type="checkbox" {...register("saude.vacinas_em_dia")} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  Vacinação Regular
+                </label>
+                <TagInput area="saude" tags={currentAlertas} onAdd={handleAddTag} onRemove={handleRemoveTag} />
+              </div>
             </Section>
 
-            <Section title="Eixo Educação" icon={GraduationCap} color="bg-blue-50">
-              <InputField label="Unidade de Ensino" name="educacao.escola" register={register} />
-              <InputField label="Frequência Escolar (%)" name="educacao.frequencia_percent" type="number" register={register}/>
-              <TagInput area="educacao" tags={currentAlertas} onAdd={handleAddTag} onRemove={handleRemoveTag} />
+            <Section title="Educação" icon={GraduationCap} color="bg-white">
+              <div className="space-y-4 p-1">
+                <InputField label="Unidade de Ensino" name="educacao.escola" register={register} />
+                <InputField label="Frequência (%)" name="educacao.frequencia_percent" type="number" register={register}/>
+                <TagInput area="educacao" tags={currentAlertas} onAdd={handleAddTag} onRemove={handleRemoveTag} />
+              </div>
             </Section>
           </div>
 
-          {/* COLUNA 3: ASSISTÊNCIA E ALERTAS SOCIAIS */}
-          <Section title="Assistência Social" icon={HandHelping} color="bg-purple-50">
-            <div className="grid grid-cols-1 gap-2 mb-6">
-              <label className="flex items-center gap-2 font-black text-[10px] bg-white border-2 border-gray-900 p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer">
-                <input type="checkbox" {...register("assistencia.cad_unico")} className="w-4 h-4 accent-black" />
-                CADASTRO ÚNICO ATIVO
-              </label>
-              <label className="flex items-center gap-2 font-black text-[10px] bg-white border-2 border-gray-900 p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer">
-                <input type="checkbox" {...register("assistencia.beneficio_ativo")} className="w-4 h-4 accent-black" />
-                RECEBE BENEFÍCIO (BPC/PBF)
-              </label>
+          {/* COLUNA 3: ASSISTÊNCIA */}
+          <Section title="Social" icon={HandHelping} color="bg-white">
+            <div className="space-y-4 p-1">
+              <div className="grid grid-cols-1 gap-3">
+                <label className="flex items-center gap-3 font-medium text-sm text-slate-700 bg-slate-50 border border-slate-200 p-3 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+                  <input type="checkbox" {...register("assistencia.cad_unico")} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  CadÚnico Ativo
+                </label>
+                <label className="flex items-center gap-3 font-medium text-sm text-slate-700 bg-slate-50 border border-slate-200 p-3 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+                  <input type="checkbox" {...register("assistencia.beneficio_ativo")} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  Recebe Benefício
+                </label>
+              </div>
+              <hr className="border-slate-100 my-2" />
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Vulnerabilidades:</p>
+              <TagInput area="assistencia" tags={currentAlertas} onAdd={handleAddTag} onRemove={handleRemoveTag} />
             </div>
-            <p className="text-[10px] font-black uppercase mb-2 text-purple-900 underline italic">Alertas de Vulnerabilidade:</p>
-            <TagInput area="assistencia" tags={currentAlertas} onAdd={handleAddTag} onRemove={handleRemoveTag} />
           </Section>
         </div>
 
         {/* Botão de Submissão */}
-        <button 
-          type="submit"
-          disabled={mutation.isPending}
-          className="w-full mt-10 bg-blue-600 text-white py-6 border-4 border-gray-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all font-black text-2xl uppercase italic flex items-center justify-center gap-4 active:bg-green-500"
-        >
-          <Save size={32} />
-          {mutation.isPending ? "Processando no Banco..." : "Salvar Atualizações do Prontuário"}
-        </button>
+        <div className="mt-12 flex justify-end">
+          <button 
+            type="submit"
+            disabled={mutation.isPending}
+            className="w-full md:w-auto px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-3 disabled:bg-slate-300"
+          >
+            {mutation.isPending ? (
+               <span className="animate-pulse">Salvando...</span>
+            ) : (
+              <>
+                <Save size={24} />
+                Salvar Prontuário
+              </>
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

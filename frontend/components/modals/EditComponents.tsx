@@ -9,16 +9,16 @@ interface SectionProps {
   color: string;
 }
 
+// 1. Section: Removido shadow e border-4, adicionado border suave e arredondamento
 export const Section = ({ title, icon: Icon, children, color }: SectionProps) => (
-  <div className={`p-4 border-4 border-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${color} mb-6`}>
-    <h3 className="flex items-center gap-2 font-black uppercase italic text-sm mb-4 border-b-2 border-gray-900 pb-2">
-      <Icon size={18} /> {title}
+  <div className={`p-5 border border-slate-200 rounded-xl ${color} h-fit`}>
+    <h3 className="flex items-center gap-2 font-bold uppercase tracking-wider text-[11px] text-slate-500 mb-5 border-b border-slate-100 pb-3">
+      <Icon size={16} className="text-slate-400" /> {title}
     </h3>
     {children}
   </div>
 );
 
-// 2. Tipagem para o InputField (Zero Any usando FieldValues e Path)
 interface InputFieldProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   name: Path<T>; 
@@ -26,6 +26,7 @@ interface InputFieldProps<T extends FieldValues> extends React.InputHTMLAttribut
   error?: FieldErrors<T>[Path<T>]; 
 }
 
+// 2. InputField: Removido border-gray-900, adicionado foco com anel suave (ring)
 export function InputField<T extends FieldValues>({ 
   label, 
   register, 
@@ -33,19 +34,20 @@ export function InputField<T extends FieldValues>({
   error, 
   ...props 
 }: InputFieldProps<T>) {
-  // Extraímos a mensagem de erro de forma segura sem 'any'
   const errorMessage = error?.message?.toString();
 
   return (
     <div className="mb-4">
-      <label className="block text-[10px] font-black uppercase mb-1">{label}</label>
+      <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1.5 ml-1">
+        {label}
+      </label>
       <input 
         {...register(name)} 
         {...props}
-        className="w-full border-2 border-gray-900 p-2 font-bold focus:bg-yellow-50 outline-none transition-colors" 
+        className="w-full border border-slate-200 rounded-lg p-2.5 text-sm font-medium text-slate-700 bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" 
       />
       {errorMessage && (
-        <span className="text-red-600 text-[10px] font-black mt-1 block italic">
+        <span className="text-red-500 text-[10px] font-medium mt-1 ml-1 block">
           {errorMessage}
         </span>
       )}
@@ -53,7 +55,6 @@ export function InputField<T extends FieldValues>({
   );
 }
 
-// 3. Tipagem para o TagInput (Zero Any)
 interface Alerta {
   tipo: string;
   area: string;
@@ -66,6 +67,7 @@ interface TagInputProps {
   onRemove: (tipo: string, area: string) => void;
 }
 
+// 3. TagInput: Tags agora são arredondadas e suaves (bg-slate-100) em vez de pretas
 export const TagInput = ({ area, tags, onAdd, onRemove }: TagInputProps) => {
   const [text, setText] = useState("");
 
@@ -81,27 +83,27 @@ export const TagInput = ({ area, tags, onAdd, onRemove }: TagInputProps) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2 p-2 border-2 border-gray-900 bg-white min-h-[45px] items-center">
+      <div className="flex flex-wrap gap-2 p-2 border border-slate-200 rounded-lg bg-white min-h-[45px] items-center focus-within:border-blue-400 transition-colors">
         {tags
           .filter((t) => t.area === area)
           .map((tag, i) => (
             <span 
               key={`${area}-${tag.tipo}-${i}`} 
-              className="bg-gray-900 text-white px-2 py-0.5 text-[9px] font-black flex items-center gap-1 uppercase tracking-tighter"
+              className="bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded-md text-[10px] font-bold flex items-center gap-1.5 uppercase transition-hover hover:bg-slate-200"
             >
               {tag.tipo}
               <button 
                 type="button" 
                 onClick={() => onRemove(tag.tipo, area)}
-                className="hover:text-red-400 transition-colors ml-1"
+                className="text-slate-400 hover:text-red-500 transition-colors"
               >
-                <X size={10} />
+                <X size={12} />
               </button>
             </span>
           ))}
         <input 
-          placeholder="Adicionar..."
-          className="outline-none text-[10px] font-bold flex-1 min-w-[80px] bg-transparent"
+          placeholder="Adicionar alerta..."
+          className="outline-none text-xs font-medium flex-1 min-w-[100px] bg-transparent text-slate-600 placeholder:text-slate-400"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
