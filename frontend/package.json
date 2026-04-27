@@ -19,7 +19,10 @@
     "next": "16.2.4",
     "react": "19.2.4",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.x.x",
+    "@hookform/resolvers": "^3.x.x",
+    "zod": "^3.x.x"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

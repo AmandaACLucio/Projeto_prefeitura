@@ -13,7 +13,7 @@ import AlertBadge from "@/components/ui/table/AlertBadge";
 import TableActions from "@/components/ui/table/TableActions";
 import EmptyState from "@/components/ui/table/EmptyState";
 import DeleteModal from "@/components/ui/modals/DeleteModal";
-import EditChildModal from "@/components/modals/EditChildModals"; // Importe o novo modal
+import EditChildModal from "@/components/modals/EditChildModals";
 import LoadingState from "@/components/shared/LoadingState";
 
 // Tipagens

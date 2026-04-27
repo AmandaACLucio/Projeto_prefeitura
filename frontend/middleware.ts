@@ -8,13 +8,9 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     const isPublicRoute = pathname === '/login';
-
-    console.log("ENTREI")
     if (!token && !isPublicRoute) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
-
-            console.log("token:", token)
 
     if (token && isPublicRoute) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -26,6 +22,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|nav|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

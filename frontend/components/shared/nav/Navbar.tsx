@@ -40,7 +40,7 @@ export function Navbar() {
             src="/nav/logo-pref-2025.png" 
             alt="Logo" 
             width={180} 
-            height={60} 
+            height={60}
             className="h-auto w-auto max-h-16"
           />
         </Link>

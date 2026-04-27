@@ -16,8 +16,6 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 
   Cookies.set('auth-token', token, { expires: 7, path: '/' });
   localStorage.setItem("token", token);
-
-  return res.data;
 }
 
 export function logout() {
