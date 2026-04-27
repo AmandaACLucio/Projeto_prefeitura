@@ -23,14 +23,15 @@ const childSchema = z.object({
   nome: z.string().min(1, "O nome é obrigatório"),
   responsavel: z.string().min(1, "O responsável é obrigatório"),
   bairro: z.string().min(1, "O bairro é obrigatório"),
+  data_nascimento: z.string().min(1, "Data de nascimento é obrigatória"),
   saude: z.object({
-    ultima_consulta: z.string(),
+    ultima_consulta: z.string().optional().nullable(),
     vacinas_em_dia: z.boolean(),
   }),
-    educacao: z.object({
+  educacao: z.object({
     escola: z.string().optional().nullable(),
-    frequencia_percent: z.number().min(0).max(100).optional(),
-    }),
+    frequencia_percent: z.coerce.number().min(0).max(100).optional(),
+  }),
   assistencia: z.object({
     cad_unico: z.boolean().optional(),
     beneficio_ativo: z.boolean().optional(),
@@ -70,8 +71,9 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
         nome: child.nome,
         responsavel: child.responsavel,
         bairro: child.bairro,
+        data_nascimento: child.data_nascimento ? child.data_nascimento.split("T")[0] : "",
         saude: {
-          ultima_consulta: child.saude?.ultima_consulta?.split("T")[0] || "",
+          ultima_consulta: child.saude?.ultima_consulta ? child.saude.ultima_consulta.split("T")[0] : "",
           vacinas_em_dia: !!child.saude?.vacinas_em_dia,
         },
         educacao: {
@@ -88,14 +90,22 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
   }, [child, reset]);
 
   const mutation = useMutation({
-    mutationFn: (data: ChildFormValues) => updateChild(child!.id, data),
+    mutationFn: (data: any) => updateChild(child!.id, data),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["children"] });
-        queryClient.invalidateQueries({ queryKey: ["child", child?.id?.toString()] });
-        
-        onClose();
-      },
+      queryClient.invalidateQueries({ queryKey: ["children"] });
+      queryClient.invalidateQueries({ queryKey: ["child", child?.id?.toString()] });
+      onClose();
+    },
   });
+
+  // Função auxiliar para tratar a data sem erro de RangeError e sem pular dia
+  const formatSafeDate = (dateStr: string | undefined | null) => {
+    if (!dateStr || dateStr.trim() === "") return null;
+    // Forçamos o horário para meio-dia (12:00) para evitar que o fuso horário (UTC-3)
+    // jogue a data para as 21:00 do dia anterior ao converter para ISOString.
+    const dateObj = new Date(`${dateStr}T12:00:00`);
+    return isNaN(dateObj.getTime()) ? null : dateObj.toISOString();
+  };
 
   const handleAddTag = (tipo: string, area: string) => {
     const jaExiste = currentAlertas.some(a => a.tipo === tipo && a.area === area);
@@ -114,10 +124,19 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
       <form 
-        onSubmit={handleSubmit((data) => mutation.mutate(data))}
+        onSubmit={handleSubmit((data) => {
+          const formattedData = {
+            ...data,
+            data_nascimento: formatSafeDate(data.data_nascimento),
+            saude: {
+              ...data.saude,
+              ultima_consulta: formatSafeDate(data.saude?.ultima_consulta),
+            }
+          };
+          mutation.mutate(formattedData);
+        })}
         className="bg-slate-50 w-full max-w-6xl max-h-[92vh] overflow-y-auto p-8 rounded-2xl shadow-md border border-white relative"
       >
-        {/* Botão Fechar */}
         <button 
           type="button" 
           onClick={onClose} 
@@ -126,7 +145,6 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
           <X size={24} />
         </button>
 
-        {/* Header */}
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-slate-200 pb-6">
           <div>
             <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
@@ -141,17 +159,15 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* COLUNA 1: IDENTIFICAÇÃO */}
           <Section title="Identificação" icon={User} color="bg-white">
             <div className="space-y-4 p-1">
               <InputField label="Nome da Criança" name="nome" register={register} error={errors.nome} />
               <InputField label="Nome do Responsável" name="responsavel" register={register} error={errors.responsavel} />
               <InputField label="Bairro / Comunidade" name="bairro" register={register} error={errors.bairro} />
+              <InputField label="Data de nascimento" name="data_nascimento" type="date" register={register} error={errors.data_nascimento} />
             </div>
           </Section>
 
-          {/* COLUNA 2: SAÚDE E EDUCAÇÃO */}
           <div className="space-y-6">
             <Section title="Saúde" icon={HeartPulse} color="bg-white">
               <div className="space-y-4 p-1">
@@ -173,7 +189,6 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
             </Section>
           </div>
 
-          {/* COLUNA 3: ASSISTÊNCIA */}
           <Section title="Social" icon={HandHelping} color="bg-white">
             <div className="space-y-4 p-1">
               <div className="grid grid-cols-1 gap-3">
@@ -193,7 +208,6 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
           </Section>
         </div>
 
-        {/* Botão de Submissão */}
         <div className="mt-12 flex justify-end">
           <button 
             type="submit"

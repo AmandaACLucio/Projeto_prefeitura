@@ -134,14 +134,33 @@ async function updateChild(id, data) {
     ...childData,
     data_nascimento: childData.data_nascimento ? new Date(childData.data_nascimento) : undefined,
 
-    // ... (upserts de saude, educacao, assistencia permanecem iguais)
+    saude: saude ? {
+      upsert: {
+        create: { ...saude, ultima_consulta: saude.ultima_consulta ? new Date(saude.ultima_consulta) : null },
+        update: { ...saude, ultima_consulta: saude.ultima_consulta ? new Date(saude.ultima_consulta) : null }
+      }
+    } : undefined,
+
+    educacao: educacao ? {
+      upsert: {
+        create: { ...educacao },
+        update: { ...educacao }
+      }
+    } : undefined,
+
+    assistencia: assistencia ? {
+      upsert: {
+        create: { ...assistencia },
+        update: { ...assistencia }
+      }
+    } : undefined,
 
     alertas: {
       deleteMany: {}, 
       
       create: (alertas && alertas.length > 0) ? alertas.map(alerta => ({
         area: alerta.area,
-        tipo: alerta.tipo // ou 'tag' dependendo de como você nomeou
+        tipo: alerta.tipo 
       })) : []
     }
   };

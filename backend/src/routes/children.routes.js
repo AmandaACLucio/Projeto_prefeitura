@@ -61,7 +61,7 @@ router.patch("/:id/review", auth, async (req, res) => {
  * PUT /children/:id
  * Atualiza dados cadastrais (Requer Autenticação)
  */
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id",  async (req, res) => {
   try {
     const updated = await service.updateChild(req.params.id, req.body);
     res.json(updated);
