@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getChildren, deleteChild, reviewChild } from "@/services/children.service";
 import { useRouter } from "next/navigation";
-// Componentes que criamos
+
+// Componentes
 import FilterBar from "@/components/ui/filters/FilterBar";
 import Pagination from "@/components/ui/navigation/Pagination";
 import StatusBadge from "@/components/ui/table/StatusBadge";
@@ -12,6 +13,7 @@ import AlertBadge from "@/components/ui/table/AlertBadge";
 import TableActions from "@/components/ui/table/TableActions";
 import EmptyState from "@/components/ui/table/EmptyState";
 import DeleteModal from "@/components/ui/modals/DeleteModal";
+import EditChildModal from "@/components/modals/EditChildModals"; // Importe o novo modal
 
 // Tipagens
 import { FilterParams } from "@/types/filters";
@@ -21,22 +23,19 @@ export default function ChildrenView() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  // 1. Estados de Controle
   const [filters, setFilters] = useState<FilterParams>({ search: "", bairro: "", status: "" });
   const [page, setPage] = useState(1);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedChild, setSelectedChild] = useState<{ id: string | number, nome: string } | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Estado do Modal de Edição
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
 
-  // 2. Busca de Dados (Tratando o objeto de retorno do service)
-  const { data, isLoading, isPlaceholderData} = useQuery({
+  const { data, isLoading, isPlaceholderData } = useQuery({
     queryKey: ["children", filters, page],
     queryFn: () => getChildren({ ...filters, page }),
     placeholderData: (previousData) => previousData,
-    staleTime: 1000 * 60 * 5, // 5 minutos: os dados não ficam "velhos" instantaneamente
+    staleTime: 1000 * 60 * 5,
   });
 
-
-  // 3. Mutações
   const deleteMutation = useMutation({
     mutationFn: deleteChild,
     onSuccess: () => {
@@ -51,22 +50,25 @@ export default function ChildrenView() {
   });
 
   // Handlers
-  const handleOpenDelete = (id: string | number, nome: string) => {
-    setSelectedChild({ id, nome });
+  const handleOpenDelete = (child: Child) => {
+    setSelectedChild(child);
     setIsDeleteModalOpen(true);
   };
 
+  const handleOpenEdit = (child: Child) => {
+    setSelectedChild(child);
+    setIsEditModalOpen(true);
+  };
+
   const isInitialLoading = isLoading && !data;
-  // 4. Guardião de Loading Inicial
   if (isInitialLoading) {
     return (
-      <div className="p-8 flex items-center justify-center min-h-screen text-gray-400 animate-pulse">
+      <div className="p-8 flex items-center justify-center min-h-screen text-gray-400 animate-pulse font-black uppercase italic">
         Carregando base de dados da prefeitura...
       </div>
     );
   }
 
-  // 5. Verificação de Dados Segura (Evita o erro de length)
   const hasData = data?.list && data.list.length > 0;
   
   return (
@@ -75,12 +77,11 @@ export default function ChildrenView() {
         
         <header className="flex justify-between items-end mb-2">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Crianças Monitoradas</h1>
-            <p className="text-sm text-gray-500">Gestão de alertas e revisões do município</p>
+            <h1 className="text-2xl font-bold text-gray-800 uppercase italic">Crianças Monitoradas</h1>
+            <p className="text-sm text-gray-500 font-medium">Gestão de alertas e revisões do município</p>
           </div>
         </header>
 
-        {/* Filtros */}
         <FilterBar 
           onFilterChange={(newFilters) => { 
             setFilters(newFilters); 
@@ -93,13 +94,13 @@ export default function ChildrenView() {
         ) : (
           <div className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-opacity ${isPlaceholderData ? 'opacity-50' : 'opacity-100'}`}>
             <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 border-b">
-                <tr className="text-gray-500 text-[11px] uppercase tracking-wider">
-                  <th className="px-6 py-4 font-bold">Criança / Responsável</th>
-                  <th className="px-6 py-4 font-bold">Bairro</th>
-                  <th className="px-6 py-4 font-bold text-center">Alertas ativos</th>
-                  <th className="px-6 py-4 font-bold text-center">Status</th>
-                  <th className="px-6 py-4 font-bold text-right pr-10">Ações</th>
+              <thead className="bg-gray-50 border-b font-black uppercase italic text-[11px] text-gray-500 tracking-wider">
+                <tr>
+                  <th className="px-6 py-4">Criança / Responsável</th>
+                  <th className="px-6 py-4">Bairro</th>
+                  <th className="px-6 py-4 text-center">Alertas ativos</th>
+                  <th className="px-6 py-4 text-center">Status</th>
+                  <th className="px-6 py-4 text-right pr-10">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -109,9 +110,9 @@ export default function ChildrenView() {
                       <p className="font-bold text-gray-900 group-hover:text-blue-700 transition">
                         {child.nome}
                       </p>
-                      <p className="text-[11px] text-gray-400">{child.responsavel}</p>
+                      <p className="text-[11px] text-gray-400 uppercase font-black tracking-tight">{child.responsavel}</p>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                    <td className="px-6 py-4 text-sm text-gray-600 font-bold uppercase">
                       {child.bairro}
                     </td>
                     <td className="px-6 py-4">
@@ -130,10 +131,9 @@ export default function ChildrenView() {
                       <TableActions 
                         id={child.id}
                         onView={(id) => router.push(`/children/${id}`)}
-                        onEdit={(id) => console.log("Editar criança:", id)}
-                        onDelete={() => handleOpenDelete(child.id, child.nome)}
+                        onEdit={() => handleOpenEdit(child)} 
+                        onDelete={() => handleOpenDelete(child)}
                         onReview={(id) => reviewMutation.mutate(id)}
-                        // Edit pode ser um modal ou nova página futuramente
                       />
                     </td>
                   </tr>
@@ -141,7 +141,6 @@ export default function ChildrenView() {
               </tbody>
             </table>
 
-            {/* Navegação */}
             <div className="p-4 bg-gray-50/50 border-t">
               <Pagination 
                 current={page} 
@@ -153,13 +152,23 @@ export default function ChildrenView() {
         )}
       </div>
 
-      {/* Modal de Exclusão */}
+      {/* Modais */}
       <DeleteModal 
         isOpen={isDeleteModalOpen}
         name={selectedChild?.nome}
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => selectedChild && deleteMutation.mutate(selectedChild.id)}
       />
+
+      {isEditModalOpen && (
+        <EditChildModal 
+          child={selectedChild} 
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedChild(null);
+          }} 
+        />
+      )}
     </div>
   );
 }

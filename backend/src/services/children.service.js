@@ -128,16 +128,29 @@ async function markAsReviewed(id, user) {
  * ATUALIZAR DADOS
  */
 async function updateChild(id, data) {
-  const updated = await prisma.child.update({
-    where: { id },
-    data: {
-      ...data,
-      data_nascimento: data.data_nascimento ? new Date(data.data_nascimento) : undefined
+  const { alertas, saude, educacao, assistencia, ...childData } = data;
+
+  const updatePayload = {
+    ...childData,
+    data_nascimento: childData.data_nascimento ? new Date(childData.data_nascimento) : undefined,
+
+    // ... (upserts de saude, educacao, assistencia permanecem iguais)
+
+    alertas: {
+      deleteMany: {}, 
+      
+      create: (alertas && alertas.length > 0) ? alertas.map(alerta => ({
+        area: alerta.area,
+        tipo: alerta.tipo // ou 'tag' dependendo de como você nomeou
+      })) : []
     }
+  };
+
+  return await prisma.child.update({
+    where: { id },
+    data: updatePayload,
+    include: { alertas: true, saude: true, educacao: true, assistencia: true }
   });
-  
-  await updateHistorico();
-  return updated;
 }
 
 /**
