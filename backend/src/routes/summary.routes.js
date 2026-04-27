@@ -9,8 +9,8 @@ router.get("/", async (req, res) => {
   res.json(data);
 });
 
-router.get("/stats-history", async (req, res) => {
-  const history = await historicoService.getHistorico();
+router.get("/stats-history/:limit", async (req, res) => {
+  const history = await historicoService.getHistorico(req.params.limit);
   res.json(history);
 });
 

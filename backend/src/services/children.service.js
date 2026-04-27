@@ -154,23 +154,47 @@ async function deleteChild(id) {
 
 // No seu children.service.js ou em um novo dashboard.service.js
 async function getHeatmapData() {
-  const stats = await prisma.child.groupBy({
-    by: ['bairro'],
-    _count: {
-      id: true,
-    },
+  // 1. Buscamos os bairros únicos que possuem alertas
+  const bairros = await prisma.child.findMany({
     where: {
-      alertas: {
-        some: {} // Conta apenas crianças que possuem algum alerta
-      }
-    }
+      alertas: { some: {} }
+    },
+    select: { bairro: true },
+    distinct: ['bairro'],
   });
 
-  // Transforma para um formato que o Frontend entenda fácil
-  return stats.map(item => ({
-    bairro: item.bairro,
-    intensidade: item._count.id
-  }));
+  // 2. Para cada bairro, calculamos os totais por categoria
+  const heatmap = await Promise.all(
+    bairros.map(async (item) => {
+      const counts = await prisma.alerta.groupBy({
+        by: ['area'],
+        _count: { _all: true },
+        where: {
+          child: { bairro: item.bairro }
+        }
+      });
+
+      // Transformamos o array do groupBy em um objeto amigável
+      const stats = {
+        bairro: item.bairro,
+        saude: 0,
+        educacao: 0,
+        assistencia: 0,
+        totalAlertas: 0
+      };
+
+      counts.forEach(c => {
+        if (c.area === 'saude') stats.saude = c._count._all;
+        if (c.area === 'educacao') stats.educacao = c._count._all;
+        if (c.area === 'assistencia') stats.assistencia = c._count._all;
+        stats.totalAlertas += c._count._all;
+      });
+
+      return stats;
+    })
+  );
+
+  return heatmap.sort((a, b) => b.totalAlertas - a.totalAlertas);
 }
 
 module.exports = {

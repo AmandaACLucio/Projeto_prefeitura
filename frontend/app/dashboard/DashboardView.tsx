@@ -3,6 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { getSummary, getHistory, getHeatmap } from "@/services/sumary.service";
 import Card from "@/components/ui/Card";
+import HistoricalStepChart from "@/components/ui/graphs/HistoricalStepChart";
+import HeatmapGrid from "@/components/ui/graphs/HeatmapGrid";
 import { 
   Users, 
   Stethoscope, 
@@ -12,14 +14,27 @@ import {
 } from "lucide-react";
 
 export default function DashboardView() {
-  const { data, isLoading } = useQuery({
+
+  const { data: summary, isLoading : loadingSummary } = useQuery({
     queryKey: ["summary"],
     queryFn: getSummary,
   });
 
-  const isInitialLoading = isLoading && !data;
-  if (isInitialLoading) return <div className="p-8 animate-pulse text-blue-900 font-semibold">Sincronizando dados...</div>;
-  if (!data) return null;
+  const { data: historyLogs, isLoading: loadingHistory } = useQuery({
+    queryKey: ["history-logs"],
+    queryFn: () => getHistory(20),
+  });
+
+  const { data: bairroStats, isLoading: loadingBairros } = useQuery({
+    queryKey: ["bairro-stats"],
+    queryFn: getHeatmap,
+  });
+
+  const isAnyLoading = loadingSummary || loadingHistory || loadingBairros;
+
+  //const isInitialLoading = isLoading && !data;
+  if (isAnyLoading) return <div className="p-8 animate-pulse text-blue-900 font-semibold">Sincronizando dados...</div>;
+  if (!summary) return null;
 
   return (
     <div className="w-full p-6 bg-gray-50 min-h-screen">
@@ -30,7 +45,7 @@ export default function DashboardView() {
           
           <Card 
             title="Total de crianças" 
-            value={data.total} 
+            value={summary.total} 
             color="bg-[#00c0ef]" // Azul Celeste
             icon={<Users size={64}/>} 
             href="/children" 
@@ -38,7 +53,7 @@ export default function DashboardView() {
           
           <Card 
             title="Alertas Saúde" 
-            value={data.alertas.saude} 
+            value={summary.alertas.saude} 
             color="bg-[#f39c12]" // Laranja
             icon={<Stethoscope size={64} />}
             href="/children"
@@ -46,7 +61,7 @@ export default function DashboardView() {
 
           <Card 
             title="Alertas Educação" 
-            value={data.alertas.educacao} 
+            value={summary.alertas.educacao} 
             color="bg-[#00a65a]" // Verde
             icon={<GraduationCap size={64} />}
             href="/children"
@@ -54,7 +69,7 @@ export default function DashboardView() {
 
           <Card 
             title="Alertas Assistência" 
-            value={data.alertas.assistencia} 
+            value={summary.alertas.assistencia} 
             color="bg-[#dd4b39]" // Vermelho
             icon={<HeartHandshake size={64} />}
             href="/children"
@@ -62,12 +77,35 @@ export default function DashboardView() {
 
           <Card 
             title="Revisados" 
-            value={data.revisados} 
+            value={summary.revisados} 
             color="bg-[#605ca8]" // Roxo/Cinza Escuro
             icon={<CheckCircle size={64} />}
           />
 
         </div>
+        {/* Container dos Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          
+          {/* Card do Gráfico de Evolução */}
+          <div className="bg-white p-4 border-2 border-gray-200 shadow-md] rounded-xl">
+            <h3 className="font-bold uppercase text-sm mb-4 border-b-2 border-gray-100 pb-2">
+              Evolução de Alertas (Snapshots)
+            </h3>
+            <HistoricalStepChart logs={historyLogs ?? []} />
+          </div>
+
+          {/* Card do Heatmap por Bairro */}
+          <div className="bg-white p-4 border-2 border-gray-200 shadow-md] rounded-xl overflow-hidden">
+            <h3 className="font-bold uppercase text-sm mb-4 border-b-2 border-gray-100 pb-2">
+              Densidade por Bairro
+            </h3>
+            <div className="max-h-[300px] overflow-y-auto"> {/* Scroll interno se a lista for longa */}
+              <HeatmapGrid data={bairroStats ?? []} />
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );

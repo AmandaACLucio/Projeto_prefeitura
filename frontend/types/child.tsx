@@ -27,6 +27,7 @@ export interface Child {
   nome: string;
   responsavel: string;
   bairro: string;
+  data_nascimento: string;
   revisado: boolean;
   alertas: Alerta[];
   createdAt?: string;

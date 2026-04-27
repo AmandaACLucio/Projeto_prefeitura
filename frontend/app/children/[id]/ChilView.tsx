@@ -35,6 +35,7 @@ export default function ChildView({ id }: { id: string }) {
         <div className="flex gap-4 mt-2 text-gray-500 font-medium">
           <p>📍 {child.bairro}</p>
           <p>👤 Responsável: {child.responsavel}</p>
+          <p>👶 Data de Nascimento: {new Date(child.data_nascimento).toLocaleDateString()}</p>
         </div>
       </div>
 

@@ -29,10 +29,11 @@ async function gerarSnapshotDashboard() {
   return { message: "Snapshot de histórico gerado com sucesso" };
 }
 
-async function getHistorico() {
+async function getHistorico(limit) {
+  const take = parseInt(limit, 10);
   return prisma.historico.findMany({
-    orderBy: { criado_em: 'asc' },
-    take: 40
+    orderBy: { criado_em: 'desc' },
+    take: take
   });
 }
 
