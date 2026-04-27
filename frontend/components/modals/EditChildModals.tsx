@@ -79,8 +79,8 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
           frequencia_percent: child.educacao?.frequencia_percent || 0,
         },
         assistencia: {
-          cad_unico: !!child.assistencia_social?.cad_unico,
-          beneficio_ativo: !!child.assistencia_social?.beneficio_ativo,
+          cad_unico: !!child.assistencia?.cad_unico,
+          beneficio_ativo: !!child.assistencia?.beneficio_ativo,
         },
         alertas: child.alertas?.map(a => ({ tipo: a.tipo, area: a.area })) || [],
       });
@@ -90,9 +90,11 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
   const mutation = useMutation({
     mutationFn: (data: ChildFormValues) => updateChild(child!.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["children"] });
-      onClose();
-    },
+        queryClient.invalidateQueries({ queryKey: ["children"] });
+        queryClient.invalidateQueries({ queryKey: ["child", child?.id?.toString()] });
+        
+        onClose();
+      },
   });
 
   const handleAddTag = (tipo: string, area: string) => {

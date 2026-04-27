@@ -33,7 +33,7 @@ export interface Child {
   createdAt?: string;
   saude?: Saude;
   educacao?: Educacao;
-  assistencia_social?: Assistencia;
+  assistencia?: Assistencia;
 }
 
 // Para criação, o ID e os alertas estruturados geralmente não são enviados da mesma forma

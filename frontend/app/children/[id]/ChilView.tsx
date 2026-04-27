@@ -15,6 +15,7 @@ export default function ChildView({ id }: { id: string }) {
   const { data: child, isLoading } = useQuery({
     queryKey: ["child", id],
     queryFn: () => getChildById(id),
+    refetchOnWindowFocus: true,
   });
 
   const mutation = useMutation({
@@ -87,16 +88,16 @@ export default function ChildView({ id }: { id: string }) {
 
         <div className="border rounded-lg p-5 bg-white shadow-sm flex flex-col">
           <h2 className="font-bold text-lg mb-4 text-purple-600 border-b pb-2">Assistência Social</h2>
-          {child.assistencia_social ? (
+          {child.assistencia ? (
             <div className="text-sm space-y-3 flex-grow">
               <p className="flex justify-between">
                 <span className="text-gray-500">CadÚnico:</span>
-                <span className="font-medium">{child.assistencia_social?.cad_unico ? "Sim" : "Não"}</span>
+                <span className="font-medium">{child.assistencia?.cad_unico ? "Sim" : "Não"}</span>
               </p>
               <p className="flex justify-between">
                 <span className="text-gray-500">Benefício ativo:</span>
-                <span className={child.assistencia_social?.beneficio_ativo ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
-                  {child.assistencia_social?.beneficio_ativo ? "Sim" : "Não"}
+                <span className={child.assistencia?.beneficio_ativo ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                  {child.assistencia?.beneficio_ativo ? "Sim" : "Não"}
                 </span>
               </p>
             </div>
