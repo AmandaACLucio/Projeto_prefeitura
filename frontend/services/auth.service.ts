@@ -1,4 +1,5 @@
 ﻿import api from "@/lib/api";
+import Cookies from 'js-cookie';
 
 type LoginPayload = {
   email: string;
@@ -6,17 +7,17 @@ type LoginPayload = {
 };
 
 type AuthResponse = {
-  access_token: string;
+  token: string;
 };
 
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const res = await api.post("/auth/token", payload);
+  const token = res.data.token;
 
-  const data = res.data;
-  
-  localStorage.setItem("token", data.access_token);
+  Cookies.set('auth-token', token, { expires: 7, path: '/' });
+  localStorage.setItem("token", token);
 
-  return data;
+  return res.data;
 }
 
 export function logout() {

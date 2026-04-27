@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getChildren, deleteChild, reviewChild } from "@/services/children.service";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,13 @@ export default function ChildrenView() {
     placeholderData: (previousData) => previousData,
     staleTime: 1000 * 60 * 5,
   });
+
+  const listaBairros = useMemo(() => {
+    if (!data?.list) return [];
+      const uniqueBairros = Array.from(new Set(data?.list.map((c: Child) => c.bairro)));
+      return uniqueBairros.sort();
+    }, [data?.list]
+  );
 
   const deleteMutation = useMutation({
     mutationFn: deleteChild,
@@ -83,6 +90,7 @@ export default function ChildrenView() {
         </header>
 
         <FilterBar 
+          bairros={listaBairros} 
           onFilterChange={(newFilters) => { 
             setFilters(newFilters); 
             setPage(1); 

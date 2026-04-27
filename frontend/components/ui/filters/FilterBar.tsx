@@ -4,9 +4,10 @@ import { FilterParams } from "@/types/filters";
 
 interface FilterBarProps {
   onFilterChange: (filters: FilterParams) => void;
+  bairros?: string[];
 }
 
-export default function FilterBar({ onFilterChange }: FilterBarProps) {
+export default function FilterBar({ onFilterChange, bairros = [] }: FilterBarProps) {
   const [search, setSearch] = useState("");
   const [bairro, setBairro] = useState("");
   const [status, setStatus] = useState("");
@@ -23,12 +24,17 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
     <div className="bg-white p-4 rounded-xl shadow-sm border flex flex-wrap gap-4 items-center justify-between">
       <div className="flex gap-3">
         <select 
+          value={bairro}
           onChange={(e) => setBairro(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"
+          className="border rounded-lg px-3 py-2 text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 font-medium"
         >
           <option value="">Todos os Bairros</option>
-          <option value="Rocinha">Rocinha</option>
-          <option value="Bangu">Bangu</option>
+          {/* Mapeia os bairros dinamicamente */}
+          {bairros.map((nomeBairro) => (
+            <option key={nomeBairro} value={nomeBairro}>
+              {nomeBairro}
+            </option>
+          ))}
         </select>
 
         <select 

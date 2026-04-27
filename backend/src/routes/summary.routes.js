@@ -3,6 +3,7 @@ const router = express.Router();
 const service = require("../services/summary.service");
 const historicoService = require("../services/historico.service")
 const childrenService = require("../services/children.service")
+const auth = require("../middleware/auth");
 
 router.get("/", async (req, res) => {
   const data = await service.getSummary();
