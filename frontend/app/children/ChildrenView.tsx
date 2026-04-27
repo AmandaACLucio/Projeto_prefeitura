@@ -14,6 +14,7 @@ import TableActions from "@/components/ui/table/TableActions";
 import EmptyState from "@/components/ui/table/EmptyState";
 import DeleteModal from "@/components/ui/modals/DeleteModal";
 import EditChildModal from "@/components/modals/EditChildModals"; // Importe o novo modal
+import LoadingState from "@/components/shared/LoadingState";
 
 // Tipagens
 import { FilterParams } from "@/types/filters";
@@ -70,8 +71,8 @@ export default function ChildrenView() {
   const isInitialLoading = isLoading && !data;
   if (isInitialLoading) {
     return (
-      <div className="p-8 flex items-center justify-center min-h-screen text-gray-400 animate-pulse font-black uppercase italic">
-        Carregando base de dados da prefeitura...
+      <div>
+        <LoadingState />
       </div>
     );
   }

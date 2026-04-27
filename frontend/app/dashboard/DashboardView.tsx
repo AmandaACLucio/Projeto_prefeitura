@@ -5,6 +5,7 @@ import { getSummary, getHistory, getHeatmap } from "@/services/sumary.service";
 import Card from "@/components/ui/Card";
 import HistoricalStepChart from "@/components/ui/graphs/HistoricalStepChart";
 import HeatmapGrid from "@/components/ui/graphs/HeatmapGrid";
+import LoadingState from "@/components/shared/LoadingState";
 import { 
   Users, 
   Stethoscope, 
@@ -33,7 +34,10 @@ export default function DashboardView() {
   const isAnyLoading = loadingSummary || loadingHistory || loadingBairros;
 
   //const isInitialLoading = isLoading && !data;
-  if (isAnyLoading) return <div className="p-8 animate-pulse text-blue-900 font-semibold">Sincronizando dados...</div>;
+  if (isAnyLoading) return (
+  <div>
+    <LoadingState />
+  </div>);
   if (!summary) return null;
 
   return (

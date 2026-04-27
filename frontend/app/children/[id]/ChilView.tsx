@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getChildById, reviewChild } from "@/services/children.service";
 import { Edit3 } from "lucide-react";
 import EditChildModal from "@/components/modals/EditChildModals";
+import LoadingState from "@/components/shared/LoadingState";
 
 export default function ChildView({ id }: { id: string }) {
   const router = useRouter();
@@ -27,7 +28,12 @@ export default function ChildView({ id }: { id: string }) {
     },
   });
 
-  if (isLoading && !child) return <div className="p-6 text-gray-500">Carregando...</div>;
+  if (isLoading && !child) return (
+    <div>
+      <LoadingState />
+    </div>
+  );
+
   if (!child) return null;
 
   return (
