@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getChildren, deleteChild, reviewChild } from "@/services/children.service";
 import { useRouter } from "next/navigation";
 
-// Componentes
 import FilterBar from "@/components/ui/filters/FilterBar";
 import Pagination from "@/components/ui/navigation/Pagination";
 import StatusBadge from "@/components/ui/table/StatusBadge";
@@ -16,7 +15,6 @@ import DeleteModal from "@/components/ui/modals/DeleteModal";
 import EditChildModal from "@/components/modals/EditChildModals";
 import LoadingState from "@/components/shared/LoadingState";
 
-// Tipagens
 import { FilterParams } from "@/types/filters";
 import { Child, Alerta } from "@/types/child";
 
@@ -57,7 +55,6 @@ export default function ChildrenView() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["children"] }),
   });
 
-  // Handlers
   const handleOpenDelete = (child: Child) => {
     setSelectedChild(child);
     setIsDeleteModalOpen(true);
@@ -161,7 +158,6 @@ export default function ChildrenView() {
         )}
       </div>
 
-      {/* Modais */}
       <DeleteModal 
         isOpen={isDeleteModalOpen}
         name={selectedChild?.nome}

@@ -12,7 +12,7 @@ export default function FilterBar({ onFilterChange, bairros = [] }: FilterBarPro
   const [bairro, setBairro] = useState("");
   const [status, setStatus] = useState("");
 
-  // Debounce: Só dispara o filtro 500ms após o usuário parar de digitar
+
   useEffect(() => {
     const handler = setTimeout(() => {
       onFilterChange({ search, bairro, status });

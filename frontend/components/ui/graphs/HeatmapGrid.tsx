@@ -7,25 +7,21 @@
 }
 
 export default function HeatmapGrid({ data }: { data: BairroStats[] }) {
-  // data deve ser algo como: [{ bairro: 'Centro', saude: 10, educacao: 5 }, ...]
   
 const getIntensityClass = (value: number, type: 'saude' | 'educacao' | 'assistencia') => {
     if (value === 0) return 'bg-gray-50 text-gray-400'; // Estado neutro
 
     const colors = {
-      // Tons de Amarelo/Laranja para Saúde
       saude: [
         { min: 20, class: 'bg-yellow-600 text-white' },
         { min: 5, class: 'bg-yellow-400 text-yellow-950' },
         { min: 1,  class: 'bg-yellow-100 text-yellow-800' },
       ],
-      // Tons de Verde para Educação
       educacao: [
         { min: 20, class: 'bg-emerald-700 text-white' },
         { min: 5, class: 'bg-emerald-500 text-white' },
         { min: 1,  class: 'bg-emerald-100 text-emerald-800' },
       ],
-      // Tons de Vermelho para Assistência
       assistencia: [
         { min: 20, class: 'bg-red-700 text-white' },
         { min: 5, class: 'bg-red-500 text-white' },

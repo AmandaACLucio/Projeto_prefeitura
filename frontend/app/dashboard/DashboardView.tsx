@@ -33,7 +33,6 @@ export default function DashboardView() {
 
   const isAnyLoading = loadingSummary || loadingHistory || loadingBairros;
 
-  //const isInitialLoading = isLoading && !data;
   if (isAnyLoading) return (
   <div>
     <LoadingState />
@@ -50,7 +49,7 @@ export default function DashboardView() {
           <Card 
             title="Total de crianças" 
             value={summary.total} 
-            color="bg-[#00c0ef]" // Azul Celeste
+            color="bg-[#00c0ef]"
             icon={<Users size={64}/>} 
             href="/children" 
           />
@@ -58,7 +57,7 @@ export default function DashboardView() {
           <Card 
             title="Alertas Saúde" 
             value={summary.alertas.saude} 
-            color="bg-[#f39c12]" // Laranja
+            color="bg-[#f39c12]"
             icon={<Stethoscope size={64} />}
             href="/children"
           />
@@ -66,7 +65,7 @@ export default function DashboardView() {
           <Card 
             title="Alertas Educação" 
             value={summary.alertas.educacao} 
-            color="bg-[#00a65a]" // Verde
+            color="bg-[#00a65a]"
             icon={<GraduationCap size={64} />}
             href="/children"
           />
@@ -74,7 +73,7 @@ export default function DashboardView() {
           <Card 
             title="Alertas Assistência" 
             value={summary.alertas.assistencia} 
-            color="bg-[#dd4b39]" // Vermelho
+            color="bg-[#dd4b39]"
             icon={<HeartHandshake size={64} />}
             href="/children"
           />
@@ -82,7 +81,7 @@ export default function DashboardView() {
           <Card 
             title="Revisados" 
             value={summary.revisados} 
-            color="bg-[#605ca8]" // Roxo/Cinza Escuro
+            color="bg-[#605ca8]"
             icon={<CheckCircle size={64} />}
           />
 

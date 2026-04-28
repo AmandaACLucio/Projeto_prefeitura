@@ -98,11 +98,8 @@ export default function EditChildModal({ child, onClose }: EditChildModalProps) 
     },
   });
 
-  // Função auxiliar para tratar a data sem erro de RangeError e sem pular dia
   const formatSafeDate = (dateStr: string | undefined | null) => {
     if (!dateStr || dateStr.trim() === "") return null;
-    // Forçamos o horário para meio-dia (12:00) para evitar que o fuso horário (UTC-3)
-    // jogue a data para as 21:00 do dia anterior ao converter para ISOString.
     const dateObj = new Date(`${dateStr}T12:00:00`);
     return isNaN(dateObj.getTime()) ? null : dateObj.toISOString();
   };

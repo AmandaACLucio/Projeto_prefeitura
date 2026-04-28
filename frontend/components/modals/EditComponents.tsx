@@ -9,7 +9,6 @@ interface SectionProps {
   color: string;
 }
 
-// 1. Section: Removido shadow e border-4, adicionado border suave e arredondamento
 export const Section = ({ title, icon: Icon, children, color }: SectionProps) => (
   <div className={`p-5 border border-slate-200 rounded-xl ${color} h-fit`}>
     <h3 className="flex items-center gap-2 font-bold uppercase tracking-wider text-[11px] text-slate-500 mb-5 border-b border-slate-100 pb-3">
@@ -26,7 +25,6 @@ interface InputFieldProps<T extends FieldValues> extends React.InputHTMLAttribut
   error?: FieldErrors<T>[Path<T>]; 
 }
 
-// 2. InputField: Removido border-gray-900, adicionado foco com anel suave (ring)
 export function InputField<T extends FieldValues>({ 
   label, 
   register, 
@@ -67,7 +65,6 @@ interface TagInputProps {
   onRemove: (tipo: string, area: string) => void;
 }
 
-// 3. TagInput: Tags agora são arredondadas e suaves (bg-slate-100) em vez de pretas
 export const TagInput = ({ area, tags, onAdd, onRemove }: TagInputProps) => {
   const [text, setText] = useState("");
 

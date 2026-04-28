@@ -1,7 +1,6 @@
 ﻿const prisma = require("../lib/prisma");
 
 async function gerarSnapshotDashboard() {
-  // 1. Conta os totais atuais no banco
   const totalCriancas = await prisma.child.count();
   
   const totalSaude = await prisma.alerta.count({
@@ -16,7 +15,6 @@ async function gerarSnapshotDashboard() {
     where: { area: "assistencia" }
   });
 
-  // 2. Salva no histórico (usando createMany para ser mais rápido)
   await prisma.historico.createMany({
     data: [
       { tipo: "total_criancas", valor: totalCriancas },
