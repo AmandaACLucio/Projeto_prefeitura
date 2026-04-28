@@ -44,7 +44,7 @@ O projeto está totalmente containerizado com Docker, garantindo que o ambiente 
 
 ### 3. Prisma ORM com PostgreSQL
 **Decisão:** Uso do Prisma pela sua tipagem forte e facilidade em lidar com relações complexas (como os objetos aninhados de Saúde e Educação).
-**Trade-off:** O Prisma pode ser ligeiramente mais lento que queries SQL puras em operações massivas, mas para um sistema de gestão (CRUD pesado), a produtividade e a segurança de tipos (Typescript) compensam.
+**Trade-off:** O Prisma pode ser ligeiramente mais lento que queries SQL puras em operações massivas, mas para um sistema de gestão (CRUD pesado), a produtividade e a segurança de tipos (Typescript) é uma boa alternativa.
 
 ### 4. Middleware de Autenticação
 **Decisão:** Centralizar a proteção de rotas no `middleware.ts` do Next.js.
@@ -58,8 +58,8 @@ O projeto está totalmente containerizado com Docker, garantindo que o ambiente 
 
 2. **Arquitetura de Micro-serviços:** Se o sistema escalasse para toda a prefeitura, separaria os módulos de Saúde, Educação e Social em serviços independentes para que pudessem escalar individualmente.
 
-4. **Design mais responivo:** Implementaria responsividade nas telas, que devido ao curto prazo, não foi uma prioridade
+3. **Design mais responsivo:** Implementaria responsividade nas telas, que devido ao curto prazo, não foi uma prioridade, mas é extremamente importante que seja inserido
 
-5. **Acessibilidade (WCAG):** Realizaria uma auditoria completa de acessibilidade para garantir que o sistema seja utilizável por todos os cidadãos e servidores públicos, seguindo os padrões governamentais.
+4. **Acessibilidade (WCAG):** Realizaria uma auditoria completa de acessibilidade para garantir que o sistema seja utilizável por todos os cidadãos e servidores públicos, seguindo todos os padrões.
 
 
