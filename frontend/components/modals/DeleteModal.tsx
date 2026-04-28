@@ -2,7 +2,7 @@
   isOpen: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-  name?: string; // Interrogação pois pode ser undefined enquanto o modal abre
+  name?: string;
 }
 
 export default function DeleteModal({ 

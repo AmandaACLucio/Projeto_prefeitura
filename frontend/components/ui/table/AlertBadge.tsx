@@ -4,7 +4,6 @@
 }
 
 export default function AlertBadge({ children, variant }: AlertBadgeProps) {
-  // Mapeamento de cores baseado na área do alerta
   const styles: Record<string, string> = {
     saude: "bg-orange-100 text-orange-700 border-orange-200",
     educacao: "bg-green-100 text-green-700 border-green-200",

@@ -13,7 +13,6 @@ type Props = {
 export default function Card({ title, value, icon, color, href }: Props) {
   return (
     <div className={`${color} rounded-md shadow-md text-white flex flex-col h-full relative group`}>
-      {/* Parte Superior: Dados e Ícone */}
       <div className="p-4 flex justify-between items-center relative overflow-hidden">
         <div className="z-10">
           <h3 className="text-4xl font-bold mb-1">{value}</h3>
@@ -22,13 +21,11 @@ export default function Card({ title, value, icon, color, href }: Props) {
           </p>
         </div>
         
-        {/* Ícone estilizado no fundo à direita */}
         <div className="absolute right-2 top-4 opacity-20 transform scale-125 group-hover:scale-150 transition-transform duration-300">
           {icon}
         </div>
       </div>
 
-      {/* Parte Inferior: Link de ação */}
       <div className="mt-auto">
         {href ? (
           <Link 

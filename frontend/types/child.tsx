@@ -36,14 +36,11 @@ export interface Child {
   assistencia?: Assistencia;
 }
 
-// Para criação, o ID e os alertas estruturados geralmente não são enviados da mesma forma
 export interface CreateChildInput {
   nome: string;
   responsavel: string;
   bairro: string;
-  // Aqui você enviaria os IDs dos alertas ou um array de strings
   alertasIds?: string[] | number[]; 
 }
 
-// O Update pode ser parcial (opcional)
 export type UpdateChildInput = Partial<CreateChildInput>;
